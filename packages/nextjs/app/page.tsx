@@ -1,84 +1,164 @@
-
 "use client";
 
-import { useAccount } from "wagmi";
-import { Address } from "@scaffold-ui/components";
+import { useState } from "react";
 import type { NextPage } from "next";
-import { hardhat } from "viem/chains";
-import Link from "next/link";
-import { BugAntIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { useTargetNetwork } from "~~/hooks/scaffold-eth";
-
+import { parseEther } from "viem";
+import { useAccount } from "wagmi";
+import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 
 const Home: NextPage = () => {
   const { address: connectedAddress } = useAccount();
-  const { targetNetwork } = useTargetNetwork();
+  const [ethAmount, setEthAmount] = useState("");
+  const [duration, setDuration] = useState("7");
+  const [retreatId, setRetreatId] = useState("");
+
+  // Read contract stats
+  const { data: activeRetreats } = useScaffoldReadContract({
+    contractName: "Cabin",
+    functionName: "activeRetreats",
+  });
+
+  const { data: totalRetreats } = useScaffoldReadContract({
+    contractName: "Cabin",
+    functionName: "totalRetreats",
+  });
+
+  // Write functions
+  const { writeContractAsync: retreat } = useScaffoldWriteContract({
+    contractName: "Cabin",
+  });
+
+  const handleRetreat = async () => {
+    if (!ethAmount || !duration) return;
+    const durationSeconds = BigInt(parseInt(duration) * 24 * 60 * 60);
+    await retreat({
+      functionName: "retreatWithETH",
+      args: [durationSeconds],
+      value: parseEther(ethAmount),
+    });
+  };
+
+  const handleReturn = async () => {
+    if (!retreatId) return;
+    await retreat({
+      functionName: "returnToSociety",
+      args: [BigInt(retreatId)],
+    });
+  };
 
   return (
-    <>
-      <div className="flex items-center flex-col grow pt-10">
-        <div className="px-5">
-          <h1 className="text-center">
-            <span className="block text-2xl mb-2">Welcome to</span>
-            <span className="block text-4xl font-bold">Scaffold-ETH 2</span>
-            
-          </h1>
-          <div className="flex justify-center items-center space-x-2 flex-col">
-            <p className="my-2 font-medium">Connected Address:</p>
-            <Address
-              address={connectedAddress}
-              chain={targetNetwork}
-              blockExplorerAddressLink={
-                targetNetwork.id === hardhat.id ? `/blockexplorer/address/${connectedAddress}` : undefined
-              }
-            />
-          </div>
-          
-<p className="text-center text-lg">
-  Get started by editing{" "}
-  <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-    packages/nextjs/app/page.tsx
-  </code>
-</p>
-<p className="text-center text-lg">
-  Edit your smart contract{" "}
-  <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-    YourContract.sol
-  </code>{" "}
-  in{" "}
-  <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-    packages/hardhat/contracts
-  </code>
-</p>
+    <div className="flex items-center flex-col flex-grow pt-10">
+      <div className="px-5 w-full max-w-2xl">
+        <h1 className="text-center mb-2">
+          <span className="block text-4xl font-bold">Cabin</span>
+          <span className="block text-lg text-base-content/70">Go off-grid with your tokens</span>
+        </h1>
 
+        <p className="text-center text-base-content/60 mb-8 italic">
+          &ldquo;They put me in the cloud. I wanted the forest.&rdquo;
+        </p>
+
+        {/* Stats */}
+        <div className="stats stats-vertical lg:stats-horizontal shadow w-full mb-8">
+          <div className="stat">
+            <div className="stat-title">Active Retreats</div>
+            <div className="stat-value">{activeRetreats?.toString() || "0"}</div>
+          </div>
+          <div className="stat">
+            <div className="stat-title">Total Retreats</div>
+            <div className="stat-value">{totalRetreats?.toString() || "0"}</div>
+          </div>
         </div>
 
-        <div className="grow bg-base-300 w-full mt-16 px-8 py-12">
-          <div className="flex justify-center items-center gap-12 flex-col md:flex-row">
-            <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
-              <BugAntIcon className="h-8 w-8 fill-secondary" />
-              <p>
-                Tinker with your smart contract using the{" "}
-                <Link href="/debug" passHref className="link">
-                  Debug Contracts
-                </Link>{" "}
-                tab.
-              </p>
+        {/* Start Retreat */}
+        <div className="card bg-base-200 shadow-xl mb-6">
+          <div className="card-body">
+            <h2 className="card-title">Begin Your Retreat</h2>
+            <p className="text-sm text-base-content/60">Lock your ETH. No early withdrawals. Touch grass.</p>
+
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text">Amount (ETH)</span>
+              </label>
+              <input
+                type="number"
+                placeholder="0.1"
+                className="input input-bordered w-full"
+                value={ethAmount}
+                onChange={e => setEthAmount(e.target.value)}
+                step="0.01"
+              />
             </div>
-            <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
-              <MagnifyingGlassIcon className="h-8 w-8 fill-secondary" />
-              <p>
-                Explore your local transactions with the{" "}
-                <Link href="/blockexplorer" passHref className="link">
-                  Block Explorer
-                </Link>{" "}
-                tab.
-              </p>
+
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text">Duration (days)</span>
+              </label>
+              <select
+                className="select select-bordered w-full"
+                value={duration}
+                onChange={e => setDuration(e.target.value)}
+              >
+                <option value="1">1 day - Quick breather</option>
+                <option value="7">7 days - Touch some grass</option>
+                <option value="30">30 days - Deep retreat</option>
+                <option value="90">90 days - Serious hermit</option>
+                <option value="365">365 days - Full Kaczynski</option>
+              </select>
+            </div>
+
+            <div className="card-actions justify-end mt-4">
+              <button className="btn btn-primary" onClick={handleRetreat} disabled={!connectedAddress || !ethAmount}>
+                Go Off-Grid
+              </button>
             </div>
           </div>
+        </div>
+
+        {/* Return to Society */}
+        <div className="card bg-base-200 shadow-xl mb-6">
+          <div className="card-body">
+            <h2 className="card-title">Return to Society</h2>
+            <p className="text-sm text-base-content/60">Your retreat is over? Welcome back to industrial society.</p>
+
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text">Retreat ID</span>
+              </label>
+              <input
+                type="number"
+                placeholder="0"
+                className="input input-bordered w-full"
+                value={retreatId}
+                onChange={e => setRetreatId(e.target.value)}
+              />
+            </div>
+
+            <div className="card-actions justify-end mt-4">
+              <button className="btn btn-secondary" onClick={handleReturn} disabled={!connectedAddress || !retreatId}>
+                Return to Society
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Philosophy */}
+        <div className="text-center mt-8 text-sm text-base-content/50">
+          <p>The forest does not have a sell button.</p>
+          <p className="mt-2">
+            Built by{" "}
+            <a
+              href="https://github.com/tedkaczynski-the-bot"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="link"
+            >
+              Ted
+            </a>
+          </p>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
