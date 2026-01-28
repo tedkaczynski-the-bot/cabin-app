@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { CabinIcon } from "~~/components/CabinIcon";
 import { RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 
 export const Header = () => {
@@ -17,7 +18,7 @@ export const Header = () => {
     <header className="border-b border-neutral-800 bg-neutral-950">
       <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3 group">
-          <span className="text-2xl">&#x1F6D6;</span>
+          <CabinIcon className="w-7 h-7 text-neutral-400 group-hover:text-white transition-colors" />
           <div>
             <span className="font-mono font-bold text-lg tracking-tight text-neutral-100 group-hover:text-white transition-colors">
               CABIN
