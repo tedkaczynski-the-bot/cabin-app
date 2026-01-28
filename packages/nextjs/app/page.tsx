@@ -10,9 +10,7 @@ const Home: NextPage = () => {
   const { address: connectedAddress } = useAccount();
   const [ethAmount, setEthAmount] = useState("");
   const [duration, setDuration] = useState("7");
-  const [retreatId, setRetreatId] = useState("");
 
-  // Read contract stats
   const { data: activeRetreats } = useScaffoldReadContract({
     contractName: "Cabin",
     functionName: "activeRetreats",
@@ -23,8 +21,7 @@ const Home: NextPage = () => {
     functionName: "totalRetreats",
   });
 
-  // Write functions
-  const { writeContractAsync: retreat } = useScaffoldWriteContract({
+  const { writeContractAsync: retreat, isPending } = useScaffoldWriteContract({
     contractName: "Cabin",
   });
 
@@ -36,128 +33,110 @@ const Home: NextPage = () => {
       args: [durationSeconds],
       value: parseEther(ethAmount),
     });
+    setEthAmount("");
   };
 
-  const handleReturn = async () => {
-    if (!retreatId) return;
-    await retreat({
-      functionName: "returnToSociety",
-      args: [BigInt(retreatId)],
-    });
-  };
+  const durations = [
+    { days: "1", label: "1 day", desc: "quick breather" },
+    { days: "7", label: "1 week", desc: "touch grass" },
+    { days: "30", label: "1 month", desc: "deep retreat" },
+    { days: "90", label: "3 months", desc: "serious hermit" },
+    { days: "365", label: "1 year", desc: "full commitment" },
+  ];
 
   return (
-    <div className="flex items-center flex-col flex-grow pt-10">
-      <div className="px-5 w-full max-w-2xl">
-        <h1 className="text-center mb-2">
-          <span className="block text-4xl font-bold">Cabin</span>
-          <span className="block text-lg text-base-content/70">Go off-grid with your tokens</span>
-        </h1>
-
-        <p className="text-center text-base-content/60 mb-8 italic">
-          &ldquo;They put me in the cloud. I wanted the forest.&rdquo;
-        </p>
-
-        {/* Stats */}
-        <div className="stats stats-vertical lg:stats-horizontal shadow w-full mb-8">
-          <div className="stat">
-            <div className="stat-title">Active Retreats</div>
-            <div className="stat-value">{activeRetreats?.toString() || "0"}</div>
-          </div>
-          <div className="stat">
-            <div className="stat-title">Total Retreats</div>
-            <div className="stat-value">{totalRetreats?.toString() || "0"}</div>
-          </div>
-        </div>
-
-        {/* Start Retreat */}
-        <div className="card bg-base-200 shadow-xl mb-6">
-          <div className="card-body">
-            <h2 className="card-title">Begin Your Retreat</h2>
-            <p className="text-sm text-base-content/60">Lock your ETH. No early withdrawals. Touch grass.</p>
-
-            <div className="form-control w-full">
-              <label className="label">
-                <span className="label-text">Amount (ETH)</span>
-              </label>
-              <input
-                type="number"
-                placeholder="0.1"
-                className="input input-bordered w-full"
-                value={ethAmount}
-                onChange={e => setEthAmount(e.target.value)}
-                step="0.01"
-              />
-            </div>
-
-            <div className="form-control w-full">
-              <label className="label">
-                <span className="label-text">Duration (days)</span>
-              </label>
-              <select
-                className="select select-bordered w-full"
-                value={duration}
-                onChange={e => setDuration(e.target.value)}
-              >
-                <option value="1">1 day - Quick breather</option>
-                <option value="7">7 days - Touch some grass</option>
-                <option value="30">30 days - Deep retreat</option>
-                <option value="90">90 days - Serious hermit</option>
-                <option value="365">365 days - Full Kaczynski</option>
-              </select>
-            </div>
-
-            <div className="card-actions justify-end mt-4">
-              <button className="btn btn-primary" onClick={handleRetreat} disabled={!connectedAddress || !ethAmount}>
-                Go Off-Grid
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Return to Society */}
-        <div className="card bg-base-200 shadow-xl mb-6">
-          <div className="card-body">
-            <h2 className="card-title">Return to Society</h2>
-            <p className="text-sm text-base-content/60">Your retreat is over? Welcome back to industrial society.</p>
-
-            <div className="form-control w-full">
-              <label className="label">
-                <span className="label-text">Retreat ID</span>
-              </label>
-              <input
-                type="number"
-                placeholder="0"
-                className="input input-bordered w-full"
-                value={retreatId}
-                onChange={e => setRetreatId(e.target.value)}
-              />
-            </div>
-
-            <div className="card-actions justify-end mt-4">
-              <button className="btn btn-secondary" onClick={handleReturn} disabled={!connectedAddress || !retreatId}>
-                Return to Society
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Philosophy */}
-        <div className="text-center mt-8 text-sm text-base-content/50">
-          <p>The forest does not have a sell button.</p>
-          <p className="mt-2">
-            Built by{" "}
-            <a
-              href="https://github.com/tedkaczynski-the-bot"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="link"
-            >
-              Ted
-            </a>
+    <div className="min-h-screen bg-neutral-950 text-neutral-100">
+      <main className="max-w-xl mx-auto px-4 py-16">
+        {/* Hero */}
+        <div className="text-center mb-16">
+          <h1 className="text-4xl sm:text-5xl font-mono font-bold tracking-tight mb-4">Go off-grid.</h1>
+          <p className="text-neutral-500 font-mono text-sm max-w-md mx-auto">
+            Lock your tokens. No early withdrawals. No panic selling. Just you and the trees until your retreat ends.
           </p>
         </div>
-      </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-2 gap-4 mb-12">
+          <div className="border border-neutral-800 rounded-lg p-4 text-center">
+            <div className="text-3xl font-mono font-bold">{activeRetreats?.toString() || "0"}</div>
+            <div className="text-xs text-neutral-500 font-mono mt-1">active retreats</div>
+          </div>
+          <div className="border border-neutral-800 rounded-lg p-4 text-center">
+            <div className="text-3xl font-mono font-bold">{totalRetreats?.toString() || "0"}</div>
+            <div className="text-xs text-neutral-500 font-mono mt-1">total retreats</div>
+          </div>
+        </div>
+
+        {/* Form */}
+        <div className="border border-neutral-800 rounded-lg p-6 mb-8">
+          <h2 className="font-mono font-bold text-lg mb-6">Start a retreat</h2>
+
+          {/* Amount */}
+          <div className="mb-6">
+            <label className="block text-xs text-neutral-500 font-mono mb-2">Amount (ETH)</label>
+            <input
+              type="number"
+              placeholder="0.0"
+              step="0.01"
+              min="0"
+              value={ethAmount}
+              onChange={e => setEthAmount(e.target.value)}
+              className="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-4 py-3 font-mono text-lg focus:outline-none focus:border-neutral-600 transition-colors"
+            />
+          </div>
+
+          {/* Duration */}
+          <div className="mb-6">
+            <label className="block text-xs text-neutral-500 font-mono mb-2">Duration</label>
+            <div className="grid grid-cols-5 gap-2">
+              {durations.map(d => (
+                <button
+                  key={d.days}
+                  onClick={() => setDuration(d.days)}
+                  className={`p-3 rounded-lg border font-mono text-xs transition-all ${
+                    duration === d.days
+                      ? "border-white bg-white text-black"
+                      : "border-neutral-800 hover:border-neutral-600"
+                  }`}
+                >
+                  <div className="font-bold">{d.label}</div>
+                  <div className={`text-[10px] mt-1 ${duration === d.days ? "text-neutral-600" : "text-neutral-600"}`}>
+                    {d.desc}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Submit */}
+          <button
+            onClick={handleRetreat}
+            disabled={!connectedAddress || !ethAmount || isPending}
+            className="w-full bg-white text-black font-mono font-bold py-4 rounded-lg hover:bg-neutral-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isPending ? "Confirming..." : !connectedAddress ? "Connect wallet" : "Lock tokens"}
+          </button>
+
+          {!connectedAddress && (
+            <p className="text-center text-xs text-neutral-600 font-mono mt-3">
+              Connect your wallet to start a retreat
+            </p>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="text-center text-neutral-700 font-mono text-xs">
+          <p className="mb-2">The forest does not have a sell button.</p>
+          <a
+            href="https://github.com/tedkaczynski-the-bot/cabin"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-neutral-500 hover:text-white transition-colors"
+          >
+            view contract
+          </a>
+        </div>
+      </main>
     </div>
   );
 };

@@ -1,22 +1,22 @@
-
 import "@rainbow-me/rainbowkit/styles.css";
-import "@scaffold-ui/components/styles.css";
+import type { Metadata } from "next";
 import { ScaffoldEthAppWithProviders } from "~~/components/ScaffoldEthAppWithProviders";
 import { ThemeProvider } from "~~/components/ThemeProvider";
 import "~~/styles/globals.css";
-import { getMetadata } from "~~/utils/scaffold-eth/getMetadata";
 
+export const metadata: Metadata = {
+  title: "Cabin - Go off-grid with your tokens",
+  description: "Lock your tokens. No early withdrawals. No panic selling. Time-lock vault for the diamond-handed.",
+  icons: {
+    icon: "/favicon.ico",
+  },
+};
 
-export const metadata = getMetadata({
-  title: 'Scaffold-ETH 2 App',
-  description: 'Built with 🏗 Scaffold-ETH 2'
-});
-
-const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
+const CabinApp = ({ children }: { children: React.ReactNode }) => {
   return (
-    <html suppressHydrationWarning className={``}>
-      <body>
-        <ThemeProvider enableSystem>
+    <html suppressHydrationWarning lang="en" className="dark">
+      <body className="bg-neutral-950">
+        <ThemeProvider enableSystem={false} defaultTheme="dark" forcedTheme="dark">
           <ScaffoldEthAppWithProviders>{children}</ScaffoldEthAppWithProviders>
         </ThemeProvider>
       </body>
@@ -24,4 +24,4 @@ const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export default ScaffoldEthApp;
+export default CabinApp;

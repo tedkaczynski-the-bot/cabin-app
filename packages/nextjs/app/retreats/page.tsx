@@ -4,40 +4,38 @@ import { useState } from "react";
 import type { NextPage } from "next";
 import { formatEther } from "viem";
 import { useAccount } from "wagmi";
-import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
+import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 
 const MyRetreats: NextPage = () => {
   const { address: connectedAddress } = useAccount();
   const [retreatIds, setRetreatIds] = useState<string>("0,1,2,3,4");
 
-  // Parse retreat IDs
   const ids = retreatIds
     .split(",")
     .map(id => id.trim())
-    .filter(id => id !== "");
+    .filter(id => id !== "" && !isNaN(Number(id)));
 
   return (
-    <div className="flex items-center flex-col flex-grow pt-10">
-      <div className="px-5 w-full max-w-4xl">
-        <h1 className="text-center mb-8">
-          <span className="block text-4xl font-bold">My Retreats</span>
-          <span className="block text-lg text-base-content/70">Track your off-grid positions</span>
-        </h1>
-
-        <div className="card bg-base-200 shadow-xl mb-6">
-          <div className="card-body">
-            <h2 className="card-title">Enter Retreat IDs</h2>
-            <p className="text-sm text-base-content/60">Comma-separated list of retreat IDs to check</p>
-            <input
-              type="text"
-              className="input input-bordered w-full"
-              value={retreatIds}
-              onChange={e => setRetreatIds(e.target.value)}
-              placeholder="0, 1, 2, 3"
-            />
-          </div>
+    <div className="min-h-screen bg-neutral-950 text-neutral-100">
+      <main className="max-w-2xl mx-auto px-4 py-16">
+        <div className="text-center mb-12">
+          <h1 className="text-3xl font-mono font-bold tracking-tight mb-2">My Positions</h1>
+          <p className="text-neutral-500 font-mono text-sm">Track your locked tokens</p>
         </div>
 
+        {/* Search */}
+        <div className="mb-8">
+          <label className="block text-xs text-neutral-500 font-mono mb-2">Retreat IDs (comma separated)</label>
+          <input
+            type="text"
+            value={retreatIds}
+            onChange={e => setRetreatIds(e.target.value)}
+            placeholder="0, 1, 2, 3"
+            className="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-4 py-3 font-mono focus:outline-none focus:border-neutral-600 transition-colors"
+          />
+        </div>
+
+        {/* Cards */}
         <div className="space-y-4">
           {ids.map(id => (
             <RetreatCard key={id} retreatId={BigInt(id)} userAddress={connectedAddress} />
@@ -45,15 +43,17 @@ const MyRetreats: NextPage = () => {
         </div>
 
         {ids.length === 0 && (
-          <div className="text-center text-base-content/50 py-10">Enter retreat IDs above to view their status</div>
+          <div className="text-center py-12 text-neutral-600 font-mono text-sm">
+            Enter retreat IDs to view positions
+          </div>
         )}
-      </div>
+      </main>
     </div>
   );
 };
 
 const RetreatCard = ({ retreatId, userAddress }: { retreatId: bigint; userAddress?: string }) => {
-  const { data: retreatData } = useScaffoldReadContract({
+  const { data: retreatData, isLoading } = useScaffoldReadContract({
     contractName: "Cabin",
     functionName: "getRetreat",
     args: [retreatId],
@@ -71,15 +71,27 @@ const RetreatCard = ({ retreatId, userAddress }: { retreatId: bigint; userAddres
     args: [retreatId],
   });
 
-  if (!retreatData) {
+  const { writeContractAsync: returnToSociety, isPending } = useScaffoldWriteContract({
+    contractName: "Cabin",
+  });
+
+  const handleReturn = async () => {
+    await returnToSociety({
+      functionName: "returnToSociety",
+      args: [retreatId],
+    });
+  };
+
+  if (isLoading) {
     return (
-      <div className="card bg-base-200 shadow-xl">
-        <div className="card-body">
-          <span className="loading loading-spinner"></span>
-        </div>
+      <div className="border border-neutral-800 rounded-lg p-6 animate-pulse">
+        <div className="h-4 bg-neutral-800 rounded w-1/4 mb-4"></div>
+        <div className="h-8 bg-neutral-800 rounded w-1/2"></div>
       </div>
     );
   }
+
+  if (!retreatData) return null;
 
   const [owner, token, amount, returnTime, active] = retreatData;
   const isYours = userAddress?.toLowerCase() === owner?.toLowerCase();
@@ -87,13 +99,12 @@ const RetreatCard = ({ retreatId, userAddress }: { retreatId: bigint; userAddres
 
   if (!active) {
     return (
-      <div className="card bg-base-300 shadow-xl opacity-60">
-        <div className="card-body">
-          <div className="flex justify-between items-center">
-            <span className="font-mono">Retreat #{retreatId.toString()}</span>
-            <span className="badge badge-ghost">Completed</span>
-          </div>
-          <p className="text-sm text-base-content/50">This hermit has returned to society.</p>
+      <div className="border border-neutral-800 rounded-lg p-6 opacity-50">
+        <div className="flex justify-between items-center">
+          <span className="font-mono text-sm">#{retreatId.toString()}</span>
+          <span className="text-xs font-mono text-neutral-600 border border-neutral-800 px-2 py-1 rounded">
+            completed
+          </span>
         </div>
       </div>
     );
@@ -101,51 +112,66 @@ const RetreatCard = ({ retreatId, userAddress }: { retreatId: bigint; userAddres
 
   const formatTime = (seconds: bigint) => {
     const s = Number(seconds);
-    if (s <= 0) return "Ready to return";
+    if (s <= 0) return "Ready";
     const days = Math.floor(s / 86400);
     const hours = Math.floor((s % 86400) / 3600);
+    if (days > 0) return `${days}d ${hours}h`;
     const mins = Math.floor((s % 3600) / 60);
-    if (days > 0) return `${days}d ${hours}h remaining`;
-    if (hours > 0) return `${hours}h ${mins}m remaining`;
-    return `${mins}m remaining`;
+    if (hours > 0) return `${hours}h ${mins}m`;
+    return `${mins}m`;
   };
 
   return (
-    <div className={`card shadow-xl ${isYours ? "bg-primary/10 border border-primary" : "bg-base-200"}`}>
-      <div className="card-body">
-        <div className="flex justify-between items-center">
-          <span className="font-mono text-lg">Retreat #{retreatId.toString()}</span>
-          <div className="flex gap-2">
-            {isYours && <span className="badge badge-primary">Yours</span>}
-            {canReturn ? (
-              <span className="badge badge-success">Can Return</span>
-            ) : (
-              <span className="badge badge-warning">Locked</span>
-            )}
+    <div
+      className={`border rounded-lg p-6 transition-colors ${
+        isYours ? "border-white bg-neutral-900" : "border-neutral-800"
+      }`}
+    >
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="font-mono font-bold">#{retreatId.toString()}</span>
+            {isYours && <span className="text-[10px] font-mono bg-white text-black px-2 py-0.5 rounded">yours</span>}
+          </div>
+          <div className="text-2xl font-mono font-bold">
+            {formatEther(amount)} <span className="text-neutral-500">{isETH ? "ETH" : "tokens"}</span>
           </div>
         </div>
+        <div className="text-right">
+          {canReturn ? (
+            <span className="text-xs font-mono text-green-500 border border-green-500/30 px-2 py-1 rounded">
+              unlocked
+            </span>
+          ) : (
+            <span className="text-xs font-mono text-neutral-500 border border-neutral-800 px-2 py-1 rounded">
+              {timeRemaining !== undefined ? formatTime(timeRemaining) : "..."}
+            </span>
+          )}
+        </div>
+      </div>
 
-        <div className="grid grid-cols-2 gap-4 mt-4">
-          <div>
-            <p className="text-sm text-base-content/60">Amount</p>
-            <p className="font-bold">
-              {formatEther(amount)} {isETH ? "ETH" : "tokens"}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-base-content/60">Time Remaining</p>
-            <p className="font-bold">{timeRemaining !== undefined ? formatTime(timeRemaining) : "..."}</p>
-          </div>
-          <div>
-            <p className="text-sm text-base-content/60">Return Time</p>
-            <p className="font-mono text-sm">{new Date(Number(returnTime) * 1000).toLocaleString()}</p>
-          </div>
-          <div>
-            <p className="text-sm text-base-content/60">Owner</p>
-            <p className="font-mono text-sm truncate">{owner}</p>
+      <div className="grid grid-cols-2 gap-4 text-xs font-mono mb-4">
+        <div>
+          <div className="text-neutral-600 mb-1">return date</div>
+          <div className="text-neutral-400">{new Date(Number(returnTime) * 1000).toLocaleDateString()}</div>
+        </div>
+        <div>
+          <div className="text-neutral-600 mb-1">owner</div>
+          <div className="text-neutral-400 truncate">
+            {owner?.slice(0, 6)}...{owner?.slice(-4)}
           </div>
         </div>
       </div>
+
+      {isYours && canReturn && (
+        <button
+          onClick={handleReturn}
+          disabled={isPending}
+          className="w-full bg-white text-black font-mono font-bold py-3 rounded-lg hover:bg-neutral-200 transition-colors disabled:opacity-50"
+        >
+          {isPending ? "Confirming..." : "Return to society"}
+        </button>
+      )}
     </div>
   );
 };

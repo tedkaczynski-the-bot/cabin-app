@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { RainbowKitProvider, darkTheme, lightTheme } from "@rainbow-me/rainbowkit";
+import { RainbowKitProvider, darkTheme } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AppProgressBar as ProgressBar } from "next-nprogress-bar";
-import { useTheme } from "next-themes";
 import { Toaster } from "react-hot-toast";
 import { WagmiProvider } from "wagmi";
 import { Footer } from "~~/components/Footer";
@@ -12,17 +11,24 @@ import { Header } from "~~/components/Header";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 
-
-const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
-
+const CabinAppLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
-      <div className={`flex flex-col min-h-screen `}>
+      <div className="flex flex-col min-h-screen bg-neutral-950">
         <Header />
-        <main className="relative flex flex-col flex-1">{children}</main>
+        <main className="flex-1">{children}</main>
         <Footer />
       </div>
-      <Toaster />
+      <Toaster
+        toastOptions={{
+          style: {
+            background: "#1a1a1a",
+            color: "#fff",
+            border: "1px solid #333",
+            fontFamily: "monospace",
+          },
+        }}
+      />
     </>
   );
 };
@@ -36,8 +42,6 @@ export const queryClient = new QueryClient({
 });
 
 export const ScaffoldEthAppWithProviders = ({ children }: { children: React.ReactNode }) => {
-  const { resolvedTheme } = useTheme();
-  const isDarkMode = resolvedTheme === "dark";
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -46,12 +50,20 @@ export const ScaffoldEthAppWithProviders = ({ children }: { children: React.Reac
 
   return (
     <WagmiProvider config={wagmiConfig}>
-    <QueryClientProvider client={queryClient}>
-    <RainbowKitProvider avatar={BlockieAvatar} theme={mounted ? (isDarkMode ? darkTheme() : lightTheme()) : lightTheme()}>
-      <ProgressBar height="3px" color="#2299dd" />
-      <ScaffoldEthApp>{children}</ScaffoldEthApp>
-    </RainbowKitProvider>
-    </QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitProvider
+          avatar={BlockieAvatar}
+          theme={darkTheme({
+            accentColor: "#fff",
+            accentColorForeground: "#000",
+            borderRadius: "medium",
+            fontStack: "system",
+          })}
+        >
+          <ProgressBar height="2px" color="#fff" />
+          {mounted && <CabinAppLayout>{children}</CabinAppLayout>}
+        </RainbowKitProvider>
+      </QueryClientProvider>
     </WagmiProvider>
   );
 };
