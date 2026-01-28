@@ -200,6 +200,7 @@ const deployedContracts = {
         { type: "error", name: "ZeroDuration", inputs: [] },
       ],
       inheritedFunctions: {},
+      deployedOnBlock: 41390599,
     },
   },
   31337: {
