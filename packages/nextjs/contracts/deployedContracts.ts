@@ -5,6 +5,203 @@
 import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 
 const deployedContracts = {
+  8453: {
+    Cabin: {
+      address: "0xE978FC6c68a2dF43C5baCAfDB771A3cFE95E2c99",
+      abi: [
+        {
+          type: "function",
+          name: "MAX_DURATION",
+          inputs: [],
+          outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "MIN_DURATION",
+          inputs: [],
+          outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "activeRetreats",
+          inputs: [],
+          outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "addSuppliesETH",
+          inputs: [{ name: "retreatId", type: "uint256", internalType: "uint256" }],
+          outputs: [],
+          stateMutability: "payable",
+        },
+        {
+          type: "function",
+          name: "addSuppliesToken",
+          inputs: [
+            { name: "retreatId", type: "uint256", internalType: "uint256" },
+            { name: "amount", type: "uint256", internalType: "uint256" },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "canReturn",
+          inputs: [{ name: "retreatId", type: "uint256", internalType: "uint256" }],
+          outputs: [{ name: "", type: "bool", internalType: "bool" }],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "extendRetreat",
+          inputs: [
+            { name: "retreatId", type: "uint256", internalType: "uint256" },
+            { name: "additionalDuration", type: "uint256", internalType: "uint256" },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "getRetreat",
+          inputs: [{ name: "retreatId", type: "uint256", internalType: "uint256" }],
+          outputs: [
+            { name: "owner", type: "address", internalType: "address" },
+            { name: "token", type: "address", internalType: "address" },
+            { name: "amount", type: "uint256", internalType: "uint256" },
+            { name: "returnTime", type: "uint256", internalType: "uint256" },
+            { name: "active", type: "bool", internalType: "bool" },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "nextRetreatId",
+          inputs: [],
+          outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "retreatOwner",
+          inputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+          outputs: [{ name: "", type: "address", internalType: "address" }],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "retreatWithETH",
+          inputs: [{ name: "duration", type: "uint256", internalType: "uint256" }],
+          outputs: [{ name: "retreatId", type: "uint256", internalType: "uint256" }],
+          stateMutability: "payable",
+        },
+        {
+          type: "function",
+          name: "retreatWithToken",
+          inputs: [
+            { name: "token", type: "address", internalType: "address" },
+            { name: "amount", type: "uint256", internalType: "uint256" },
+            { name: "duration", type: "uint256", internalType: "uint256" },
+          ],
+          outputs: [{ name: "retreatId", type: "uint256", internalType: "uint256" }],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "retreats",
+          inputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+          outputs: [
+            { name: "token", type: "address", internalType: "address" },
+            { name: "amount", type: "uint256", internalType: "uint256" },
+            { name: "returnTime", type: "uint256", internalType: "uint256" },
+            { name: "active", type: "bool", internalType: "bool" },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "returnToSociety",
+          inputs: [{ name: "retreatId", type: "uint256", internalType: "uint256" }],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "timeUntilReturn",
+          inputs: [{ name: "retreatId", type: "uint256", internalType: "uint256" }],
+          outputs: [{ name: "secondsRemaining", type: "uint256", internalType: "uint256" }],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "totalRetreats",
+          inputs: [],
+          outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+          stateMutability: "view",
+        },
+        {
+          type: "event",
+          name: "RetreatExtended",
+          inputs: [
+            { name: "hermit", type: "address", indexed: true, internalType: "address" },
+            { name: "retreatId", type: "uint256", indexed: true, internalType: "uint256" },
+            { name: "newReturnTime", type: "uint256", indexed: false, internalType: "uint256" },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "RetreatStarted",
+          inputs: [
+            { name: "hermit", type: "address", indexed: true, internalType: "address" },
+            { name: "token", type: "address", indexed: true, internalType: "address" },
+            { name: "amount", type: "uint256", indexed: false, internalType: "uint256" },
+            { name: "returnTime", type: "uint256", indexed: false, internalType: "uint256" },
+            { name: "retreatId", type: "uint256", indexed: false, internalType: "uint256" },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "ReturnedToSociety",
+          inputs: [
+            { name: "hermit", type: "address", indexed: true, internalType: "address" },
+            { name: "retreatId", type: "uint256", indexed: true, internalType: "uint256" },
+            { name: "amount", type: "uint256", indexed: false, internalType: "uint256" },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "SuppliesAdded",
+          inputs: [
+            { name: "hermit", type: "address", indexed: true, internalType: "address" },
+            { name: "retreatId", type: "uint256", indexed: true, internalType: "uint256" },
+            { name: "additionalAmount", type: "uint256", indexed: false, internalType: "uint256" },
+          ],
+          anonymous: false,
+        },
+        { type: "error", name: "CannotShortenRetreat", inputs: [] },
+        { type: "error", name: "NotYourRetreat", inputs: [] },
+        { type: "error", name: "RetreatNotFound", inputs: [] },
+        {
+          type: "error",
+          name: "StillOnRetreat",
+          inputs: [
+            { name: "returnTime", type: "uint256", internalType: "uint256" },
+            { name: "currentTime", type: "uint256", internalType: "uint256" },
+          ],
+        },
+        { type: "error", name: "TransferFailed", inputs: [] },
+        { type: "error", name: "ZeroAmount", inputs: [] },
+        { type: "error", name: "ZeroDuration", inputs: [] },
+      ],
+      inheritedFunctions: {},
+    },
+  },
   31337: {
     Cabin: {
       address: "0x700b6a60ce7eaaea56f065753d8dcb9653dbad35",
