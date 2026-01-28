@@ -124,6 +124,13 @@ const Home: NextPage = () => {
           )}
         </div>
 
+        {/* Warning */}
+        <div className="border border-yellow-900/50 bg-yellow-950/20 rounded-lg p-4 mb-8 text-center">
+          <p className="text-yellow-600 font-mono text-xs">
+            This contract is unaudited. Use at your own risk. Start with small amounts.
+          </p>
+        </div>
+
         {/* Footer */}
         <div className="text-center text-neutral-700 font-mono text-xs">
           <p className="mb-2">The forest does not have a sell button.</p>

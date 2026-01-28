@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <rect width="32" height="32" fill="#0a0a0a" rx="4"/>
+  <g transform="translate(4, 4)">
+    <!-- Roof -->
+    <path d="M2 10L12 2L22 10" stroke="#fff"/>
+    <!-- Cabin body -->
+    <path d="M4 9V20H20V9" stroke="#fff"/>
+    <!-- Door -->
+    <path d="M9 20V14H15V20" stroke="#fff"/>
+    <!-- Window -->
+    <rect x="5" y="11" width="3" height="3" stroke="#fff"/>
+  </g>
+</svg>

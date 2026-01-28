@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: "Cabin - Go off-grid with your tokens",
   description: "Lock your tokens. No early withdrawals. No panic selling. Time-lock vault for the diamond-handed.",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/favicon.svg",
   },
 };
 
