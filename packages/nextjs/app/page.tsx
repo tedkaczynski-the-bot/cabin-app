@@ -134,14 +134,25 @@ const Home: NextPage = () => {
         {/* Footer */}
         <div className="text-center text-neutral-700 font-mono text-xs">
           <p className="mb-2">The forest does not have a sell button.</p>
-          <a
-            href="https://github.com/tedkaczynski-the-bot/cabin"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-neutral-500 hover:text-white transition-colors"
-          >
-            view contract
-          </a>
+          <div className="flex justify-center gap-4">
+            <a
+              href="https://github.com/tedkaczynski-the-bot/cabin"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-neutral-500 hover:text-white transition-colors"
+            >
+              view contract
+            </a>
+            <span className="text-neutral-700">|</span>
+            <a
+              href="https://x.com/unabotter"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-neutral-500 hover:text-white transition-colors"
+            >
+              @unabotter
+            </a>
+          </div>
         </div>
       </main>
     </div>
