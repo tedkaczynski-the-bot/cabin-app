@@ -1,80 +1,97 @@
-# 🏗 Scaffold-ETH 2
+# Cabin dApp
 
-<h4 align="center">
-  <a href="https://docs.scaffoldeth.io">Documentation</a> |
-  <a href="https://scaffoldeth.io">Website</a>
-</h4>
+> *Go off-grid with your tokens.*
 
-🧪 An open-source, up-to-date toolkit for building decentralized applications (dapps) on the Ethereum blockchain. It's designed to make it easier for developers to create and deploy smart contracts and build user interfaces that interact with those contracts.
+A full-stack dApp for the Cabin time-lock protocol. Built with Scaffold-ETH 2.
 
-⚙️ Built using NextJS, RainbowKit, Foundry, Wagmi, Viem, and Typescript.
+## What is Cabin?
 
-- ✅ **Contract Hot Reload**: Your frontend auto-adapts to your smart contract as you edit it.
-- 🪝 **[Custom hooks](https://docs.scaffoldeth.io/hooks/)**: Collection of React hooks wrapper around [wagmi](https://wagmi.sh/) to simplify interactions with smart contracts with typescript autocompletion.
-- 🧱 [**Components**](https://docs.scaffoldeth.io/components/): Collection of common web3 components to quickly build your frontend.
-- 🔥 **Burner Wallet & Local Faucet**: Quickly test your application with a burner wallet and local faucet.
-- 🔐 **Integration with Wallet Providers**: Connect to different wallet providers and interact with the Ethereum network.
+Cabin lets you lock your ETH or ERC20 tokens for a set duration. No early withdrawals. No panic selling. Just you and the trees until your retreat ends.
 
-![Debug Contracts tab](https://github.com/scaffold-eth/scaffold-eth-2/assets/55535804/b237af0c-5027-4849-a5c1-2e31495cccb1)
+**Use cases:**
+- Diamond hands enforcement
+- Forced HODL therapy
+- Vesting without a DAO
+- Actually touching grass (metaphorically)
 
-## Requirements
+## Features
 
-Before you begin, you need to install the following tools:
+### Home Page
+- View global stats (active retreats, total retreats)
+- Start a new retreat (lock ETH for 1-365 days)
+- Return to society (withdraw after time's up)
 
-- [Node (>= v20.18.3)](https://nodejs.org/en/download/)
-- Yarn ([v1](https://classic.yarnpkg.com/en/docs/install/) or [v2+](https://yarnpkg.com/getting-started/install))
-- [Git](https://git-scm.com/downloads)
+### My Retreats Page
+- Track multiple retreat positions
+- See time remaining on each
+- View amount locked, return date, status
+- Highlights your own retreats
 
-## Quickstart
+## Tech Stack
 
-To get started with Scaffold-ETH 2, follow the steps below:
+- **Frontend:** Next.js 15, React, TypeScript
+- **Styling:** TailwindCSS, DaisyUI
+- **Wallet:** RainbowKit, wagmi
+- **Contracts:** Foundry, Solidity 0.8.19
+- **Scaffold:** Scaffold-ETH 2
 
-1. Install dependencies if it was skipped in CLI:
+## Quick Start
 
-```
-cd my-dapp-example
+```bash
+# Install dependencies
 yarn install
-```
 
-2. Run a local network in the first terminal:
-
-```
+# Start local chain
 yarn chain
-```
 
-This command starts a local Ethereum network using Foundry. The network runs on your local machine and can be used for testing and development. You can customize the network configuration in `packages/foundry/foundry.toml`.
-
-3. On a second terminal, deploy the test contract:
-
-```
+# Deploy contracts (new terminal)
 yarn deploy
-```
 
-This command deploys a test smart contract to the local network. The contract is located in `packages/foundry/contracts` and can be modified to suit your needs. The `yarn deploy` command uses the deploy script located in `packages/foundry/script` to deploy the contract to the network. You can also customize the deploy script.
-
-4. On a third terminal, start your NextJS app:
-
-```
+# Start frontend (new terminal)
 yarn start
 ```
 
-Visit your app on: `http://localhost:3000`. You can interact with your smart contract using the `Debug Contracts` page. You can tweak the app config in `packages/nextjs/scaffold.config.ts`.
+Open http://localhost:3000
 
-Run smart contract test with `yarn foundry:test`
+## Contract
 
-- Edit your smart contracts in `packages/foundry/contracts`
-- Edit your frontend homepage at `packages/nextjs/app/page.tsx`. For guidance on [routing](https://nextjs.org/docs/app/building-your-application/routing/defining-routes) and configuring [pages/layouts](https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts) checkout the Next.js documentation.
-- Edit your deployment scripts in `packages/foundry/script`
+The Cabin contract is deployed to the local chain automatically. Key functions:
 
+```solidity
+// Lock ETH for N seconds
+function retreatWithETH(uint256 duration) external payable returns (uint256 retreatId);
 
-## Documentation
+// Withdraw after retreat ends
+function returnToSociety(uint256 retreatId) external;
 
-Visit our [docs](https://docs.scaffoldeth.io) to learn how to start building with Scaffold-ETH 2.
+// Check time remaining
+function timeUntilReturn(uint256 retreatId) external view returns (uint256);
+```
 
-To know more about its features, check out our [website](https://scaffoldeth.io).
+## Deployments
 
-## Contributing to Scaffold-ETH 2
+| Network | Address |
+|---------|---------|
+| Local (Anvil) | Deployed on `yarn deploy` |
+| Base | *coming soon* |
 
-We welcome contributions to Scaffold-ETH 2!
+## Tests
 
-Please see [CONTRIBUTING.MD](https://github.com/scaffold-eth/scaffold-eth-2/blob/main/CONTRIBUTING.md) for more information and guidelines for contributing to Scaffold-ETH 2.
+```bash
+cd packages/foundry
+forge test
+```
+
+15 tests passing.
+
+## Philosophy
+
+In a world of infinite liquidity and 24/7 markets, sometimes the most radical act is doing nothing.
+
+Cabin enforces what willpower cannot.
+
+---
+
+Built by [Ted](https://github.com/tedkaczynski-the-bot)
+
+*"The forest doesn't have a sell button."*
